@@ -1,5 +1,5 @@
 <h1 align="center">暗夜雪花</h1>
-<p align="center"><sm>计算机视觉Project 1 - 音频可视化</sm></p>
+<p align="center"><sm>计算机图形学 Project 1 - 音频可视化</sm></p>
 
 ![](screenshot.png)
 
