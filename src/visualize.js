@@ -1,4 +1,8 @@
 import { pitchDetect } from "../lib/pitch-detect";
+const pitchesOffset = -300;
+const timeWindowLength = 100;
+const valuesInTimeWindow = [];
+let pitches = [];
 
 export default function (audio, canvas, arrayBuffer) {
   let context = new AudioContext();
@@ -6,7 +10,20 @@ export default function (audio, canvas, arrayBuffer) {
   let analyser = context.createAnalyser();
 
   context.decodeAudioData(arrayBuffer, function (buffer) {
-    pitchDetect(context, analyser);
+    pitchDetect(context, analyser, (value) => {
+      valuesInTimeWindow.push(value);
+    });
+    setInterval(() => {
+      let average = 0;
+      if (valuesInTimeWindow.length) {
+        average = valuesInTimeWindow.reduce((p, c) => p + c, 0) / valuesInTimeWindow.length;
+        valuesInTimeWindow.splice(0);
+      }
+      pitches.push(average);
+      // 取最后100个元素
+      pitches = pitches.slice(-100);
+      console.log(pitches);
+    }, timeWindowLength);
   });
 
   canvas.width = window.innerWidth;
@@ -48,6 +65,12 @@ export default function (audio, canvas, arrayBuffer) {
       ctx.strokeRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
       x += barWidth + 1;
+    }
+
+    for (let i = 0; i < pitches.length; i++) {
+      ctx.strokeStyle = "#FF0000";
+      if (pitches[i] + pitchesOffset <= 0) continue;
+      ctx.strokeRect(pitches[i] + pitchesOffset - 10, (pitches.length - i) * 10, 20, 10);
     }
   }
 
