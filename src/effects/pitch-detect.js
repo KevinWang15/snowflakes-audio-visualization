@@ -20,7 +20,7 @@ export function pitchDetect(_audioContext, _analyser, _canvasContext) {
   canvasContext = _canvasContext;
   analyser.fftSize = config.fftSize;
   analyser.connect(audioContext.destination);
-  updatePitch();
+  renderFrame();
   setInterval(() => {
     let average = 0;
     if (valuesInTimeWindow.length) {
@@ -77,21 +77,18 @@ function autoCorrelate(buf) {
   return -1;
 }
 
-function updatePitch() {
+function renderFrame() {
   analyser.getFloatTimeDomainData(buf);
   valuesInTimeWindow.push(autoCorrelate(buf));
   if (!window.requestAnimationFrame)
     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
-  window.requestAnimationFrame(updatePitch);
+  window.requestAnimationFrame(renderFrame);
   for (let i = 0; i < pastPitchesData.length; i++) {
     canvasContext.strokeStyle = "white";
     if (pastPitchesData[i] <= 0) continue;
 
     canvasContext.beginPath();
-    let width = canvasContext.canvas.width / analyser.frequencyBinCount * 1.25;
-
-    canvasContext.arc(pastPitchesData[i] * 0.9, (pastPitchesData.length - i) * 8, width, 0, 2 * Math.PI, false);
+    canvasContext.arc(pastPitchesData[i] * 0.8 + 20, (pastPitchesData.length - i) * 8, 1, 0, 2 * Math.PI, false);
     canvasContext.stroke();
-    // canvasContext.strokeRect(pastPitchesData[i] + config.pitchesOffset - 10, (pastPitchesData.length - i) * 10, 20, 2000 / config.verticalBlocksCount);
   }
 }

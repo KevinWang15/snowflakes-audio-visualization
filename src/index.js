@@ -14,9 +14,9 @@ file.onchange = function () {
   audio.load();
   document.body.removeChild(file);
   let reader = new FileReader();
+  reader.readAsArrayBuffer(files[0]);
   reader.onload = function (event) {
     audio.play();
     visualize(audio, canvas, event.target.result);
   };
-  reader.readAsArrayBuffer(files[0]);
 };
