@@ -1,7 +1,13 @@
-export default function (audio, canvas) {
+import { pitchDetect } from "../lib/pitch-detect";
+
+export default function (audio, canvas, arrayBuffer) {
   let context = new AudioContext();
   let src = context.createMediaElementSource(audio);
   let analyser = context.createAnalyser();
+
+  context.decodeAudioData(arrayBuffer, function (buffer) {
+    pitchDetect(context, analyser);
+  });
 
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
