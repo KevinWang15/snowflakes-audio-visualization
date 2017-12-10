@@ -68,7 +68,8 @@ export default function (audio, canvas, arrayBuffer) {
     }
 
     for (let i = 0; i < pitches.length; i++) {
-      ctx.strokeStyle = "#FF0000";
+      ctx.strokeStyle = "rgba(255,255,255," + ((70 - (pitches.length - i)) / 70).toFixed(1) + ")";
+      console.log(ctx.strokeStyle);
       if (pitches[i] + pitchesOffset <= 0) continue;
       ctx.strokeRect(pitches[i] + pitchesOffset - 10, (pitches.length - i) * 10, 20, 10);
     }
