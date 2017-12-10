@@ -3,17 +3,19 @@
 const config = {
   verticalBlocksCount: 100,
   timeWindowLength: 80,
-  pitchesOffset: 0,
+  pitchesOffset: 20,
   goodEnoughCorrelation: 0.9,
   fftSize: 2048,
 };
 const valuesInTimeWindow = [];
 let pastPitchesData = [];
+let permanentSnow = [];
 let analyser = null;
 let buf = new Float32Array(1024);
 let audioContext;
 let canvasContext;
-
+for (let i = 0; i < 1000; i++)
+  permanentSnow[i] = 0;
 export function pitchDetect(_audioContext, _analyser, _canvasContext) {
   audioContext = _audioContext;
   analyser = _analyser;
@@ -83,12 +85,26 @@ function renderFrame() {
   if (!window.requestAnimationFrame)
     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
   window.requestAnimationFrame(renderFrame);
+  canvasContext.strokeStyle = "white";
   for (let i = 0; i < pastPitchesData.length; i++) {
-    canvasContext.strokeStyle = "white";
     if (pastPitchesData[i] <= 0) continue;
-
     canvasContext.beginPath();
-    canvasContext.arc(pastPitchesData[i] * 0.8 + 20, (pastPitchesData.length - i) * 8, 1, 0, 2 * Math.PI, false);
+    canvasContext.arc(Math.round(pastPitchesData[i] * 0.8) + config.pitchesOffset, (pastPitchesData.length - i) * 8, 1, 0, 2 * Math.PI, false);
+    if (i === 0 && pastPitchesData.length === config.verticalBlocksCount) {
+      let pos = Math.round(pastPitchesData[i] * 0.8 + config.pitchesOffset);
+      for (let j = 1; j <= 30; j++) {
+        let heightAddition = Math.sin(Math.PI / 2 * (1 - (j / 30))) * 3;
+        permanentSnow[pos - j] += heightAddition;
+        permanentSnow[pos + j] += heightAddition;
+      }
+      permanentSnow[pos] += 3;
+    }
     canvasContext.stroke();
+  }
+  canvasContext.fillStyle = "#FFFFFF90";
+  for (let i = 0; i < 1000; i++) {
+    let snowPileHeight = Math.pow(permanentSnow[i], 0.5) * 3;
+    canvasContext.fillRect(i, 800 - snowPileHeight, 1, snowPileHeight);
+    permanentSnow[i] *= 0.99;
   }
 }
