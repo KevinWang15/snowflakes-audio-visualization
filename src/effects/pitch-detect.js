@@ -2,8 +2,8 @@
 
 const config = {
   verticalBlocksCount: 100,
-  timeWindowLength: 100,
-  pitchesOffset: -300,
+  timeWindowLength: 80,
+  pitchesOffset: 0,
   goodEnoughCorrelation: 0.9,
   fftSize: 2048,
 };
@@ -84,8 +84,14 @@ function updatePitch() {
     window.requestAnimationFrame = window.webkitRequestAnimationFrame;
   window.requestAnimationFrame(updatePitch);
   for (let i = 0; i < pastPitchesData.length; i++) {
-    canvasContext.strokeStyle = "rgba(255,255,255," + ((70 - (pastPitchesData.length - i)) / 70).toFixed(1) + ")";
-    if (pastPitchesData[i] + config.pitchesOffset <= 0) continue;
-    canvasContext.strokeRect(pastPitchesData[i] + config.pitchesOffset - 10, (pastPitchesData.length - i) * 10, 20, 1000 / config.verticalBlocksCount);
+    canvasContext.strokeStyle = "white";
+    if (pastPitchesData[i] <= 0) continue;
+
+    canvasContext.beginPath();
+    let width = canvasContext.canvas.width / analyser.frequencyBinCount * 1.25;
+
+    canvasContext.arc(pastPitchesData[i] * 0.9, (pastPitchesData.length - i) * 8, width, 0, 2 * Math.PI, false);
+    canvasContext.stroke();
+    // canvasContext.strokeRect(pastPitchesData[i] + config.pitchesOffset - 10, (pastPitchesData.length - i) * 10, 20, 2000 / config.verticalBlocksCount);
   }
 }

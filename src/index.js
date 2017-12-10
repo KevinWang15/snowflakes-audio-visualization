@@ -12,6 +12,7 @@ file.onchange = function () {
   let files = this.files;
   audio.src = URL.createObjectURL(files[0]);
   audio.load();
+  document.body.removeChild(file);
   let reader = new FileReader();
   reader.onload = function (event) {
     audio.play();

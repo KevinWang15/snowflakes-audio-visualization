@@ -4,8 +4,8 @@ export default function (audio, canvas, arrayBuffer) {
   let context = new AudioContext();
   let src = context.createMediaElementSource(audio);
   let analyser = context.createAnalyser();
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = 1000;
+  canvas.height = 800;
   let ctx = canvas.getContext("2d");
 
   context.decodeAudioData(arrayBuffer, function (buffer) {
@@ -15,12 +15,8 @@ export default function (audio, canvas, arrayBuffer) {
 
   src.connect(analyser);
   analyser.connect(context.destination);
-
   analyser.fftSize = 256;
-
-
   let bufferLength = analyser.frequencyBinCount;
-  console.log(bufferLength);
 
   let dataArray = new Uint8Array(bufferLength);
 
@@ -30,6 +26,9 @@ export default function (audio, canvas, arrayBuffer) {
   let barWidth = (WIDTH / bufferLength) * 2.5;
   let barHeight;
   let x = 0;
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
 
   function renderFrame() {
     requestAnimationFrame(renderFrame);
@@ -38,9 +37,8 @@ export default function (audio, canvas, arrayBuffer) {
 
     analyser.getByteFrequencyData(dataArray);
 
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
     for (let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
 
